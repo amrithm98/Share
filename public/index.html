@@ -26,27 +26,67 @@
 </style>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-route.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-cookies.js"></script>
+
 <script type="text/javascript">
-var app = angular.module('mymedia', ['ngRoute']);
-app.controller('ctrl', function($scope, $http) {
+var app = angular.module('mymedia', ['ngRoute','ngCookies']);
+app.config(function($routeProvider, $locationProvider) {
+    $routeProvider.when('/', {
+            templateUrl: 'main.html',
+            controller: 'mainctrl'
+
+        })
+        .when('/signup', {
+            templateUrl: 'signup.html',
+            controller: 'regctrl'
+        });
+
+});
+app.controller('mainctrl', function($scope, $http) {
     function refresh() {
         $http.get('/d').then(function(response) {
             $scope.data = response.data;
         });
     }
-    $scope.remove=function(data){
-        $http.put('/new/remove',{det:data}).then(function(){
+    refresh();
+    $scope.login = function() {
+        var user = {
+            username: $scope.username,
+            password: $scope.password
+        };
+        $http.put('/users/signin', user).then(function(res) {
+            console.log(res.data.token);//token
+        }, function(err) {
+            alert('login failed');
+        });
+    };
+    $scope.remove = function(data) {
+        $http.put('/new/remove', {
+            det: data
+        }).then(function() {
             refresh();
         });
     };
-    refresh();
     $scope.submit = function() {
-        $http.post('/new', {share: $scope.share}).then(function() {
-            refresh();   
-            $scope.share='';     
+        $http.post('/new', {
+            share: $scope.share
+        }).then(function() {
+            refresh();
+            $scope.share = '';
         });
     };
 
+});
+app.controller('regctrl', function($scope, $http) {
+    $scope.reg = function() {
+        var newUser = {
+            username: $scope.username,
+            password: $scope.password
+        };
+        $http.post('/users', newUser).then(function() {
+            alert('success');
+        });
+    };
 });
 </script>
 
@@ -54,34 +94,9 @@ app.controller('ctrl', function($scope, $http) {
     <title>Amrith</title>
 </head>
 
-<body ng-controller="ctrl">
-    <h1 class="page">Share</h1>
-    <div class="container-fluid">
-        <div class="row feed">
-            <div class="col-md-4">
-                <h4>Login:</h4>
-                <br>
-                <br>
-                <input type="text" size="30" placeholder="username">
-                <br>
-                <br>
-                <input type="password" size="30" placeholder="password ">
-                <br><br>
-                <a href="/signup">Sign Up !</a>
-            </div>
-            <div class="col-md-8">
-                <div class="new">
-                    <input ng-model="share" type="text" class="form-control" placeholder="What's up?"></input>
-                    <button type="button" class="btn" ng-click="submit()">Submit</button>
-                </div>
-                <h3 ng-repeat="new in data">
-          <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-          {{new.text}}
-          <a href ng-click="remove(new._id)">Delete<span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-      </h3>
-            </div>
-        </div>
-    </div>
+<body>
+    <h1 class="page"><a href="#/">Share</a></h1>
+    <div ng-view></div>
 </body>
 
 </html>

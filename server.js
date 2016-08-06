@@ -6,26 +6,31 @@ var bodyparser=require('body-parser');
 
 var mongodb=require('mongodb');
 
+var bcrypt = require('bcryptjs');
+
 var MongoClient=mongodb.MongoClient;
 
+var jwt = require('jwt-simple');
+
+var JWT_SECRET="youcanthackthis";
 app.use(express.static('public'));
 
 app.use(bodyparser.json());
 var dbase;
-app.get('/d',function(req,res,next){
-	MongoClient.connect("mongodb://localhost:27017/media",function(err,db) {
+MongoClient.connect("mongodb://localhost:27017/media",function(err,db) {
 	if(!err)
 	{
 		dbase=db;
 		console.log("connected");
-		db.collection('mediafeed',function(err,collection){
+		}
+});
+app.get('/d',function(req,res,next){
+
+		dbase.collection('mediafeed',function(err,collection){
 			collection.find().toArray(function(err,data){
 					res.send(data);
 			});
-	});
-		}
-});
-	
+	});	
 });
 
 
@@ -48,7 +53,43 @@ app.put('/new/remove',function(req,res,next){
 	});
 	res.send();
 });
-
+app.post('/users',function(req,res,next){
+	bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.hash(req.body.password, salt, function(err, hash) {
+        // Store hash in your password DB. 
+        var user={
+		username:req.body.username,
+		password:hash};
+		dbase.collection('users',function(err,collection){
+			collection.insert(user,{w:1},function(err,data){
+					res.send();
+			});
+	});
+	res.send();
+   		 });
+	});
+	
+});
+app.put('/users/signin',function(req,res,next){
+	console.log(req.body);
+	dbase.collection('users',function(err,collection){
+			collection.findOne({username:req.body.username},function(err,user){
+				console.log(user);
+				bcrypt.compare(req.body.password,user.password, function(err, result) {
+    				// result == true 
+    			if(result)
+    			{
+    				var token = jwt.encode(user,JWT_SECRET);
+    				return res.json({token:token});//generate token instead
+    			}
+    			else{
+    				return res.status(400).send();
+    			}
+		});
+	});
+ });
+	
+});
 
 app.listen(3000,function() {
 	console.log('server up');
