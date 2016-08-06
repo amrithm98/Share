@@ -35,19 +35,24 @@ app.get('/d',function(req,res,next){
 
 
 app.post('/new',function(req,res,next){
-	console.log(req.body.share);
+	var token=req.headers.authorization;
+	var decoded=jwt.decode(token,JWT_SECRET);
 	dbase.collection('mediafeed',function(err,collection){
-			collection.insert({text:req.body.share},{w:1},function(err,data){
+			var share={text:req.body.share,
+				user:decoded._id,
+				username:decoded.username};
+			collection.insert(share,{w:1},function(err,data){
 					res.send();
 			});
 	});
 	res.send();
 });
 app.put('/new/remove',function(req,res,next){
+	var token=req.headers.authorization;
+	var decoded=jwt.decode(token,JWT_SECRET);
 	var id=req.body.det;
-	console.log(id);
 	dbase.collection('mediafeed',function(err,collection){
-			collection.remove({_id:new mongodb.ObjectID(id)},function(err,data){
+			collection.remove({_id:new mongodb.ObjectID(id),user:decoded._id},function(err,data){
 					return res.send();
 			});
 	});
@@ -74,7 +79,7 @@ app.put('/users/signin',function(req,res,next){
 	console.log(req.body);
 	dbase.collection('users',function(err,collection){
 			collection.findOne({username:req.body.username},function(err,user){
-				console.log(user);
+			if(user!=null){
 				bcrypt.compare(req.body.password,user.password, function(err, result) {
     				// result == true 
     			if(result)
@@ -85,7 +90,11 @@ app.put('/users/signin',function(req,res,next){
     			else{
     				return res.status(400).send();
     			}
+    		   
 		});
+			}
+			 else{
+    			return res.status(400).send();}
 	});
  });
 	

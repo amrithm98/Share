@@ -11,6 +11,7 @@
 .feed h3 {
     padding: 20px;
     border: 1px solid green;
+    border-radius: 20px;
 }
 
 .page {
@@ -21,7 +22,8 @@
     padding: 20px;
     border: 1px solid blue;
     ;
-    width: 100%;
+    border-radius: 20px;
+
 }
 </style>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
@@ -42,7 +44,14 @@ app.config(function($routeProvider, $locationProvider) {
         });
 
 });
-app.controller('mainctrl', function($scope, $http) {
+app.run(function($rootScope,$cookies){
+        if($cookies.get('token') && $cookies.get('currentUser'))
+        {
+            $rootScope.token=$cookies.get('token');
+            $rootScope.currentUser=$cookies.get('currentUser');
+        }
+});
+app.controller('mainctrl', function($rootScope,$scope,$http,$cookies) {
     function refresh() {
         $http.get('/d').then(function(response) {
             $scope.data = response.data;
@@ -55,22 +64,30 @@ app.controller('mainctrl', function($scope, $http) {
             password: $scope.password
         };
         $http.put('/users/signin', user).then(function(res) {
-            console.log(res.data.token);//token
+            console.log(res.data.token);
+            $cookies.put('token',res.data.token);
+            $cookies.put('currentUser',$scope.username);
+            $rootScope.token=res.data.token;
+            $rootScope.currentUser=$scope.username;
         }, function(err) {
             alert('login failed');
         });
     };
+    $scope.logout = function() {
+            $cookies.remove('token');
+            $cookies.remove('currentUser');
+            $rootScope.token=null;
+            $rootScope.currentUser=null;
+    };
     $scope.remove = function(data) {
         $http.put('/new/remove', {
             det: data
-        }).then(function() {
+        },{headers:{'authorization':$rootScope.token}}).then(function() {
             refresh();
         });
     };
     $scope.submit = function() {
-        $http.post('/new', {
-            share: $scope.share
-        }).then(function() {
+        $http.post('/new', {share: $scope.share},{headers:{'authorization':$rootScope.token}}).then(function() {
             refresh();
             $scope.share = '';
         });

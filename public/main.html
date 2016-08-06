@@ -1,29 +1,40 @@
 <div class="container-fluid">
     <div class="row feed">
         <div class="col-md-4">
-            <h4>Login:</h4>
-            <br>
-            <br>
-            <input type="text" size="30" placeholder="username"ng-model="username">
-            <br>
-            <br>
-            <input type="password" size="30" placeholder="password " ng-model="password">
-            <br>
-            <br>
-            <button type="button" ng-click="login()">Login</button>
-            <br>
-            <br>
-            <a href="#/signup">Sign Up !</a>
+            <div ng-hide="currentUser">
+                <h4>Login:</h4>
+                <br>
+                <br>
+                <input type="text" size="30" placeholder="username" ng-model="username">
+                <br>
+                <br>
+                <input type="password" size="30" placeholder="password " ng-model="password">
+                <br>
+                <br>
+                <button type="button" ng-click="login()">Login</button>
+                <br>
+                <br>
+                <a href="#/signup">Sign Up !</a>
+            </div>
+            <div ng-show="currentUser">
+               <h2> Hello, {{currentUser}}</h2>
+                <br><br>
+                <a href ng-click="logout()"><h4>Logout</h4></a>
+            </div>
         </div>
         <div class="col-md-8">
-            <div class="new">
+            <div class="new" ng-show="currentUser">
                 <input ng-model="share" type="text" class="form-control" placeholder="What's up?"></input>
                 <button type="button" class="btn" ng-click="submit()">Submit</button>
             </div>
+        
             <h3 ng-repeat="new in data">
           <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
           {{new.text}}
           <a href ng-click="remove(new._id)">Delete<span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+          <br>
+        <small>{{new.username}}</small>
+
       </h3>
         </div>
     </div>
