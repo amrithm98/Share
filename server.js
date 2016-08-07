@@ -13,11 +13,19 @@ var MongoClient=mongodb.MongoClient;
 var jwt = require('jwt-simple');
 
 var JWT_SECRET="youcanthackthis";
+
+var server_port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || 'localhost';
 app.use(express.static('public'));
 
 app.use(bodyparser.json());
 var dbase;
-MongoClient.connect("mongodb://localhost:27017/media",function(err,db) {
+mongodb_connection_string = 'mongodb://localhost:27017/' + 'media';
+//take advantage of openshift env vars when available:
+if(process.env.OPENSHIFT_MONGODB_DB_URL){
+  mongodb_connection_string = process.env.OPENSHIFT_MONGODB_DB_URL + 'media';
+}
+MongoClient.connect(mongodb_connection_string,function(err,db) {
 	if(!err)
 	{
 		dbase=db;
@@ -100,6 +108,6 @@ app.put('/users/signin',function(req,res,next){
 	
 });
 
-app.listen(3000,function() {
-	console.log('server up');
+app.listen(server_port, server_ip_address,function() {
+	console.log('Listening on " + server_ip_address + ", server_port " + port ');
 });
