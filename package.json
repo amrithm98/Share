@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "angular-cookies": "^1.5.8",
+    "angular-material": "^1.1.0-rc.5",
     "bcrypt": "^0.8.7",
     "bcryptjs": "^2.3.0",
     "body-parser": "^1.15.2",

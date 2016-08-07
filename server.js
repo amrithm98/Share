@@ -63,6 +63,7 @@ app.post('/users',function(req,res,next){
     bcrypt.hash(req.body.password, salt, function(err, hash) {
         // Store hash in your password DB. 
         var user={
+        name:req.body.name,
 		username:req.body.username,
 		password:hash};
 		dbase.collection('users',function(err,collection){
@@ -76,7 +77,6 @@ app.post('/users',function(req,res,next){
 	
 });
 app.put('/users/signin',function(req,res,next){
-	console.log(req.body);
 	dbase.collection('users',function(err,collection){
 			collection.findOne({username:req.body.username},function(err,user){
 			if(user!=null){

@@ -1,6 +1,8 @@
 <html ng-app="mymedia">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" src="/bower_components/angular-material/angular-material.css">
 <style>
+
 .feed {
     margin-left: 100px;
     margin-right: 100px;
@@ -17,21 +19,22 @@
 .page {
     margin-left: 100px;
 }
-
 .new {
     padding: 20px;
     border: 1px solid blue;
-    ;
     border-radius: 20px;
-
 }
 </style>
+
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-route.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-cookies.js"></script>
-
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
 <script type="text/javascript">
-var app = angular.module('mymedia', ['ngRoute','ngCookies']);
+var app = angular.module('mymedia', ['ngRoute','ngCookies','ngMaterial','ngAria','ngMessages']);
 app.config(function($routeProvider, $locationProvider) {
     $routeProvider.when('/', {
             templateUrl: 'main.html',
@@ -64,7 +67,6 @@ app.controller('mainctrl', function($rootScope,$scope,$http,$cookies) {
             password: $scope.password
         };
         $http.put('/users/signin', user).then(function(res) {
-            console.log(res.data.token);
             $cookies.put('token',res.data.token);
             $cookies.put('currentUser',$scope.username);
             $rootScope.token=res.data.token;
@@ -97,11 +99,12 @@ app.controller('mainctrl', function($rootScope,$scope,$http,$cookies) {
 app.controller('regctrl', function($scope, $http) {
     $scope.reg = function() {
         var newUser = {
+            name:$scope.name,
             username: $scope.username,
             password: $scope.password
         };
         $http.post('/users', newUser).then(function() {
-            alert('success');
+            alert('Click On The \'Share\' button on Top');
         });
     };
 });
@@ -109,10 +112,20 @@ app.controller('regctrl', function($scope, $http) {
 
 <head>
     <title>Amrith</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+
 </head>
 
 <body>
-    <h1 class="page"><a href="#/">Share</a></h1>
+    <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+        <h1><a href="#/">Share</a></h1>
+      </a>
+    </div>
+  </div>
+</nav>
     <div ng-view></div>
 </body>
 

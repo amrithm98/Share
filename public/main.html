@@ -1,24 +1,32 @@
 <div class="container-fluid">
     <div class="row feed">
-        <div class="col-md-4">
+        <div class="col-md-4" style="">
             <div ng-hide="currentUser">
                 <h4>Login:</h4>
                 <br>
+                <form name="mf">
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Username</label>
+                        <input required name="clientName" ng-model="username">
+                        <div ng-messages="mf.clientName.$error">
+                            <div ng-message="required">This is required.</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Password</label>
+                        <input required name="clientPass" ng-model="password">
+                        <div ng-messages="mf.clientPass.$error">
+                            <div ng-message="required">This is required.</div>
+                        </div>
+                        <md-button class="md-raised md-primary" ng-click="login()" ng-disabled="mf.$invalid">Login</md-button>
+                </form>
                 <br>
-                <input type="text" size="30" placeholder="username" ng-model="username">
-                <br>
-                <br>
-                <input type="password" size="30" placeholder="password " ng-model="password">
-                <br>
-                <br>
-                <button type="button" ng-click="login()">Login</button>
-                <br>
-                <br>
-                <a href="#/signup">Sign Up !</a>
+                <md-button ng-href="#/signup" target="_blank">Sign Up!</md-button>
             </div>
             <div ng-show="currentUser">
-               <h2> Hello, {{currentUser}}</h2>
-                <br><br>
+                <h1> Hello {{currentUser}}</h1>
+                <br>
+                <br>
                 <a href ng-click="logout()"><h4>Logout</h4></a>
             </div>
         </div>
@@ -27,7 +35,6 @@
                 <input ng-model="share" type="text" class="form-control" placeholder="What's up?"></input>
                 <button type="button" class="btn" ng-click="submit()">Submit</button>
             </div>
-        
             <h3 ng-repeat="new in data">
           <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
           {{new.text}}
